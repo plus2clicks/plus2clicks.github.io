@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calculateur de profit YouTube</title>
+<meta name="description" content="Calcule en 10 secondes combien tu perds chaque mois sur YouTube à cause de tes miniatures.">
+<meta property="og:title" content="Calculateur de profit YouTube">
+<meta property="og:description" content="Combien tu perds chaque mois à cause de tes miniatures ? Calcule-le en 10 secondes.">
+<meta name="theme-color" content="#0b0b0c">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23ff0033'/><path d='M40 30l32 20-32 20z' fill='white'/></svg>">
+<style>
+  :root {
+    --fond: #ffffff;
+    --texte: #0b0b0c;
+    --doux: #6b6b73;
+    --ligne: #e6e6ea;
+    --case: #f5f5f7;
+    --rouge: #ff0033;
+    --vert: #25d366;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background: var(--fond);
+    color: var(--texte);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.4;
+    -webkit-font-smoothing: antialiased;
+  }
+  main { max-width: 480px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 30px; line-height: 1.1; margin: 0 0 10px; letter-spacing: -0.02em; }
+  h1 span { color: var(--rouge); }
+  .sous { color: var(--doux); font-size: 17px; margin: 0 0 28px; }
+  label { display: block; font-weight: 700; font-size: 17px; margin: 0 0 8px; }
+  .aide { display: block; font-weight: 400; color: var(--doux); font-size: 14px; margin-top: 2px; }
+  .champ { position: relative; margin-bottom: 20px; }
+  input {
+    width: 100%; font: inherit; font-size: 22px; font-weight: 700;
+    padding: 16px 56px 16px 16px; border: 2px solid var(--ligne); border-radius: 14px;
+    background: var(--case); color: var(--texte); outline: none; -webkit-appearance: none;
+  }
+  input:focus { border-color: var(--texte); background: var(--fond); }
+  input.erreur { border-color: var(--rouge); }
+  .unite { position: absolute; right: 18px; bottom: 18px; font-size: 20px; font-weight: 700; color: var(--doux); pointer-events: none; }
+  button, .whatsapp {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; font: inherit; font-size: 19px; font-weight: 800;
+    padding: 18px; border: 0; border-radius: 14px; cursor: pointer; text-decoration: none;
+  }
+  #calculer { background: var(--texte); color: #fff; margin-top: 6px; }
+  #calculer:active { transform: scale(0.98); }
+  #resultat { display: none; margin-top: 32px; padding-top: 28px; border-top: 2px solid var(--ligne); text-align: center; }
+  #resultat.visible { display: block; animation: apparait .35s ease-out; }
+  @keyframes apparait { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  .petit-titre { font-size: 18px; font-weight: 700; margin: 0; }
+  .gros { font-size: 56px; font-weight: 900; color: var(--rouge); letter-spacing: -0.03em; line-height: 1.05; margin: 6px 0 2px; word-break: break-word; }
+  .par-mois { font-size: 18px; font-weight: 700; margin: 0 0 18px; }
+  .details { list-style: none; padding: 0; margin: 0 0 26px; color: var(--doux); font-size: 16px; }
+  .details li { padding: 3px 0; }
+  .details b { color: var(--texte); }
+  .bravo { font-size: 26px; font-weight: 900; margin: 6px 0 10px; }
+  .appel { font-size: 18px; font-weight: 700; margin: 0 0 14px; }
+  .whatsapp { background: var(--vert); color: #fff; }
+  .whatsapp svg { width: 26px; height: 26px; flex: none; }
+  .note { color: var(--doux); font-size: 13px; margin-top: 22px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Combien tu <span>perds</span> chaque mois sur YouTube&nbsp;?</h1>
+  <p class="sous">3 cases, 10 secondes. On calcule ce que tes miniatures te font rater.</p>
+
+  <form id="formulaire" novalidate>
+    <div class="champ">
+      <label for="vues">Tes vues par mois<span class="aide">En moyenne, toutes vidéos confondues</span></label>
+      <input id="vues" inputmode="numeric" autocomplete="off" placeholder="20 000">
+    </div>
+    <div class="champ">
+      <label for="ctr">Ton CTR moyen<span class="aide">Dans YouTube Studio → Statistiques → Audience atteinte</span></label>
+      <input id="ctr" inputmode="decimal" autocomplete="off" placeholder="4">
+      <span class="unite">%</span>
+    </div>
+    <div class="champ">
+      <label for="prix">Le prix de ce que tu vends<span class="aide">Ton accompagnement, ta formation, ton offre…</span></label>
+      <input id="prix" inputmode="numeric" autocomplete="off" placeholder="1 500">
+      <span class="unite">€</span>
+    </div>
+    <button id="calculer" type="submit">Calculer ma perte</button>
+  </form>
+
+  <section id="resultat" aria-live="polite"></section>
+</main>
+
+<script>
+  // ← Mettre ici le numéro WhatsApp de Matthis, chiffres seulement, avec l'indicatif (ex. "33612345678").
+  const WHATSAPP = "";
+  const CTR_CIBLE = 10;          // un bon CTR, celui qu'on vise avec de bonnes miniatures
+  const VUES_PAR_CLIENT = 2000;  // 1 client pour 2 000 vues
+
+  const nombre = (txt) => parseFloat(String(txt).replace(/\s/g, "").replace(",", "."));
+  const euros = (n) => Math.round(n).toLocaleString("fr-FR").replace(/ | /g, " ") + " €";
+  const entier = (n) => Math.round(n).toLocaleString("fr-FR").replace(/ | /g, " ");
+  const clientsTexte = (n) => {
+    const v = n < 10 ? Math.round(n * 10) / 10 : Math.round(n);
+    return v.toLocaleString("fr-FR") + (v >= 2 ? " clients" : " client");
+  };
+
+  // Met des espaces entre les milliers pendant la saisie (20000 → 20 000)
+  for (const id of ["vues", "prix"]) {
+    const el = document.getElementById(id);
+    el.addEventListener("input", () => {
+      const brut = el.value.replace(/\D/g, "");
+      el.value = brut ? Number(brut).toLocaleString("fr-FR").replace(/ | /g, " ") : "";
+    });
+  }
+
+  const iconeWhatsapp = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.1-1.8-.9-2-1-.3-.1-.5-.1-.7.1-.2.3-.8 1-.9 1.2-.2.2-.3.2-.6.1-.3-.1-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.4-.5c.2-.2.2-.3.3-.5.1-.2 0-.4 0-.5l-.9-2.2c-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5.1 4.5.7.3 1.3.5 1.7.6.7.2 1.4.2 1.9.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.6-.4zM12 21.8c-1.8 0-3.5-.5-5-1.4l-.4-.2-3.7 1 1-3.6-.2-.4c-1-1.6-1.5-3.3-1.5-5.2 0-5.4 4.4-9.8 9.8-9.8 2.6 0 5.1 1 6.9 2.9 1.9 1.9 2.9 4.3 2.9 6.9 0 5.4-4.4 9.8-9.8 9.8zm8.4-18.2C18.1 1.3 15.2 0 12 0 5.5 0 .1 5.3.1 11.9c0 2.1.5 4.1 1.6 5.9L0 24l6.3-1.7c1.7.9 3.7 1.4 5.7 1.4 6.6 0 11.9-5.3 11.9-11.9 0-3.2-1.2-6.2-3.5-8.4z"/></svg>';
+
+  function lienWhatsapp(message) {
+    return "https://wa.me/" + WHATSAPP + "?text=" + encodeURIComponent(message);
+  }
+
+  document.getElementById("formulaire").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const champs = { vues: nombre(document.getElementById("vues").value), ctr: nombre(document.getElementById("ctr").value), prix: nombre(document.getElementById("prix").value) };
+    let ok = true;
+    for (const [id, v] of Object.entries(champs)) {
+      const valide = isFinite(v) && v > 0 && (id !== "ctr" || v <= 100);
+      document.getElementById(id).classList.toggle("erreur", !valide);
+      if (!valide) ok = false;
+    }
+    if (!ok) return;
+
+    const { vues: v, ctr: c, prix: p } = champs;
+    const zone = document.getElementById("resultat");
+    let message, html;
+
+    if (c >= CTR_CIBLE) {
+      message = `Salut Matthis, j'ai fait le calcul : mon CTR est déjà à ${c} %. On peut aller encore plus loin ?`;
+      html = `
+        <p class="bravo">Ton CTR est déjà excellent 👏</p>
+        <p class="appel">Tu veux passer au niveau au-dessus ?</p>`;
+    } else {
+      const impressions = v / (c / 100);
+      const vuesEnPlus = impressions * (CTR_CIBLE / 100) - v;
+      const clients = vuesEnPlus / VUES_PAR_CLIENT;
+      const perte = clients * p;
+      message = `Salut Matthis, j'ai fait le calcul : je perds ${euros(perte)} par mois sur YouTube. On en parle ?`;
+      html = `
+        <p class="petit-titre">Tu perds environ</p>
+        <p class="gros">${euros(perte)}</p>
+        <p class="par-mois">chaque mois</p>
+        <ul class="details">
+          <li>soit <b>${euros(perte * 12)}</b> par an</li>
+          <li><b>+ ${entier(vuesEnPlus)}</b> vues par mois</li>
+          <li><b>+ ${clientsTexte(clients)}</b> par mois</li>
+        </ul>
+        <p class="appel">Tu veux les récupérer ?</p>`;
+    }
+
+    zone.innerHTML = html + `
+      <a class="whatsapp" href="${lienWhatsapp(message)}" target="_blank" rel="noopener">${iconeWhatsapp}Parler à Matthis sur WhatsApp</a>
+      <p class="note">Calcul : ton CTR comparé à un bon CTR de ${CTR_CIBLE} %, avec 1 client pour ${entier(VUES_PAR_CLIENT)} vues.</p>`;
+    zone.classList.add("visible");
+    zone.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+</script>
+</body>
+</html>
