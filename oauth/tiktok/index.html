@@ -1,0 +1,11 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Retour vers le Diffuseur</title>
+<body style="font-family:system-ui;display:grid;place-items:center;height:100vh;margin:0">
+<p>Retour vers le Diffuseur…</p>
+<script>
+var q = location.search || "";
+location.replace("http://127.0.0.1:5051/oauth/tiktok" + q);
+</script>
