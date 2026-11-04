@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://plus2clicks.fr/sitemap.xml
